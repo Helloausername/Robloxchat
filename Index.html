@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Firebase Chat Sender</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    }
+
+    body {
+      background-color: #f4f6f8;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+
+    .chat-card {
+      background: #ffffff;
+      width: 100%;
+      max-width: 400px;
+      border-radius: 12px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .chat-header {
+      background: #4f46e5;
+      color: white;
+      padding: 16px;
+      font-size: 1.1rem;
+      font-weight: 600;
+      text-align: center;
+    }
+
+    .chat-body {
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    label {
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: #4b5563;
+    }
+
+    input[type="text"] {
+      width: 100%;
+      padding: 12px;
+      border: 1px solid #d1d5db;
+      border-radius: 8px;
+      font-size: 0.95rem;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    input[type="text"]:focus {
+      border-color: #4f46e5;
+    }
+
+    button {
+      background: #4f46e5;
+      color: white;
+      border: none;
+      padding: 12px;
+      border-radius: 8px;
+      font-size: 0.95rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    button:hover {
+      background: #4338ca;
+    }
+
+    button:disabled {
+      background: #a5b4fc;
+      cursor: not-allowed;
+    }
+
+    .status {
+      font-size: 0.85rem;
+      text-align: center;
+      min-height: 20px;
+      color: #6b7280;
+    }
+
+    .status.success { color: #059669; }
+    .status.error { color: #dc2626; }
+  </style>
+</head>
+<body>
+
+  <div class="chat-card">
+    <div class="chat-header">Send Message</div>
+    <form id="chatForm" class="chat-body">
+      <div>
+        <label for="username">Sender</label>
+        <input type="text" id="username" placeholder="User123" value="Anonymous" required>
+      </div>
+      <div>
+        <label for="message">Message</label>
+        <input type="text" id="message" placeholder="Type a message..." required autocomplete="off">
+      </div>
+      <button type="submit" id="sendBtn">Send Message</button>
+      <div id="status" class="status"></div>
+    </form>
+  </div>
+
+  <script type="module">
+    // Firebase Modular SDK CDN Imports
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+    import { getFirestore, collection, addDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+    // Your Firebase Configuration
+    const firebaseConfig = {
+      apiKey: "AIzaSyCVLQ-2si5scvtow-l1g8GPl44gqC5RNfE",
+      authDomain: "roblocchat.firebaseapp.com",
+      projectId: "roblocchat",
+      storageBucket: "roblocchat.firebasestorage.app",
+      messagingSenderId: "670454225958",
+      appId: "1:670454225958:web:e6acf956ef23e1132d9ae7",
+      measurementId: "G-5HTC3SYFTY"
+    };
+
+    // Initialize Firebase & Firestore
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    const chatForm = document.getElementById("chatForm");
+    const messageInput = document.getElementById("message");
+    const usernameInput = document.getElementById("username");
+    const sendBtn = document.getElementById("sendBtn");
+    const statusDiv = document.getElementById("status");
+
+    // Send Message Handler
+    chatForm.addEventListener("submit", async (e) => {
+      e.preventDefault();
+
+      const text = messageInput.value.trim();
+      const user = usernameInput.value.trim();
+
+      if (!text) return;
+
+      sendBtn.disabled = true;
+      statusDiv.className = "status";
+      statusDiv.textContent = "Sending...";
+
+      try {
+        // Send payload to the 'messages' collection in Cloud Firestore
+        await addDoc(collection(db, "messages"), {
+          sender: user,
+          text: text,
+          createdAt: serverTimestamp()
+        });
+
+        statusDiv.className = "status success";
+        statusDiv.textContent = "Message sent successfully!";
+        messageInput.value = "";
+      } catch (error) {
+        console.error("Error sending message:", error);
+        statusDiv.className = "status error";
+        statusDiv.textContent = "Failed to send message.";
+      } finally {
+        sendBtn.disabled = false;
+      }
+    });
+  </script>
+</body>
+</html>
