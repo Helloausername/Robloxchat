@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Firebase Chat Sender</title>
+  <title>Roblox Executor Chat Controller</title>
   <style>
     * {
       box-sizing: border-box;
@@ -102,15 +102,11 @@
 <body>
 
   <div class="chat-card">
-    <div class="chat-header">Send Message to Roblox</div>
+    <div class="chat-header">Force Chat Message</div>
     <form id="chatForm" class="chat-body">
       <div>
-        <label for="username">Sender Name</label>
-        <input type="text" id="username" placeholder="e.g., WebAdmin" value="WebAdmin" required>
-      </div>
-      <div>
-        <label for="message">Message</label>
-        <input type="text" id="message" placeholder="Type a message..." required autocomplete="off">
+        <label for="message">Message to Send</label>
+        <input type="text" id="message" placeholder="Type message to force in Roblox..." required autocomplete="off">
       </div>
       <button type="submit" id="sendBtn">Send Message</button>
       <div id="status" class="status"></div>
@@ -118,7 +114,6 @@
   </div>
 
   <script type="module">
-    // 1. Switched imports from Firestore to Realtime Database
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
     import { getDatabase, ref, push } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
 
@@ -126,7 +121,7 @@
     const firebaseConfig = {
       apiKey: "AIzaSyCVLQ-2si5scvtow-l1g8GPl44gqC5RNfE",
       authDomain: "roblocchat.firebaseapp.com",
-      databaseURL: "https://roblocchat-default-rtdb.firebaseio.com", // Linked database URL
+      databaseURL: "https://roblocchat-default-rtdb.firebaseio.com",
       projectId: "roblocchat",
       storageBucket: "roblocchat.firebasestorage.app",
       messagingSenderId: "670454225958",
@@ -134,12 +129,11 @@
       measurementId: "G-5HTC3SYFTY"
     };
 
-    // Initialize Firebase & Realtime Database
+    // Initialize Firebase Realtime Database
     const app = initializeApp(firebaseConfig);
     const db = getDatabase(app);
 
     const chatForm = document.getElementById("chatForm");
-    const usernameInput = document.getElementById("username");
     const messageInput = document.getElementById("message");
     const sendBtn = document.getElementById("sendBtn");
     const statusDiv = document.getElementById("status");
@@ -147,26 +141,22 @@
     chatForm.addEventListener("submit", async (e) => {
       e.preventDefault();
 
-      const username = usernameInput.value.trim();
       const text = messageInput.value.trim();
-
-      if (!text || !username) return;
+      if (!text) return;
 
       sendBtn.disabled = true;
       statusDiv.className = "status";
       statusDiv.textContent = "Sending...";
 
       try {
-        // 2. Push message under the 'chats' path to match the Roblox endpoint
         const chatsRef = ref(db, "chats");
         await push(chatsRef, {
-          Username: username,
           Message: text,
-          Timestamp: Math.floor(Date.now() / 1000) // Unix timestamp matching Roblox os.time()
+          Timestamp: Math.floor(Date.now() / 1000)
         });
 
         statusDiv.className = "status success";
-        statusDiv.textContent = "Message sent to Roblox!";
+        statusDiv.textContent = "Message sent to executor!";
         messageInput.value = "";
       } catch (error) {
         console.error("Error sending message:", error);
