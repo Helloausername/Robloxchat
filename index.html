@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Roblox Executor Chat Controller</title>
+  <title>Make me say what you want!</title>
   <style>
     * {
       box-sizing: border-box;
@@ -102,11 +102,11 @@
 <body>
 
   <div class="chat-card">
-    <div class="chat-header">Force Chat Message</div>
+    <div class="chat-header">Make me chat</div>
     <form id="chatForm" class="chat-body">
       <div>
-        <label for="message">Message to Send</label>
-        <input type="text" id="message" placeholder="Type message to force in Roblox..." required autocomplete="off">
+        <label for="message">Message to Send...</label>
+        <input type="text" id="message" placeholder="Type message to make me say..." required autocomplete="off">
       </div>
       <button type="submit" id="sendBtn">Send Message</button>
       <div id="status" class="status"></div>
@@ -156,7 +156,7 @@
         });
 
         statusDiv.className = "status success";
-        statusDiv.textContent = "Message sent to executor!";
+        statusDiv.textContent = "Message sent to me!";
         messageInput.value = "";
       } catch (error) {
         console.error("Error sending message:", error);
